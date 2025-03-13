@@ -99,7 +99,7 @@ namespace CRUDOperationMVC.Controllers
                     emplist.Add(emp);
                 }
             }
-            ViewData["EmployeeList"] = emplist;
+            TempData["EmployeeList"] = emplist;
             return RedirectToAction("Create", "EmployeePortal");
         }
     }
