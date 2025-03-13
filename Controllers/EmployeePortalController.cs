@@ -24,9 +24,9 @@ namespace CRUDOperationMVC.Controllers
         public ActionResult Create(string alertdata)
         {
             List<Models.employeedetails> employeeList = TempData["EmployeeList"] as List<Models.employeedetails>;
-            
-            if (alertdata != null) 
-            { 
+
+            if (alertdata != null)
+            {
                 ViewData["AlterMsg"] = alertdata;
             }
             using (SqlConnection con = new SqlConnection(connectionstring_))
@@ -42,18 +42,18 @@ namespace CRUDOperationMVC.Controllers
             }
             return View(employeeList);
         }
-        public ActionResult CreateInsert(string username, string email, string Udate, string phno)
+        public ActionResult CreateInsert(string username, string email, string Udate, string phno, int empno)
         {
             using (SqlConnection con = new SqlConnection(connectionstring_))
             {
                 con.Open();
-                SqlCommand cmd = new SqlCommand("EmployeeInsert",con);
+                SqlCommand cmd = new SqlCommand("EmployeeInsert", con);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@empusername", username);
                 cmd.Parameters.AddWithValue("@empemail", email);
                 cmd.Parameters.AddWithValue("@empdob", Udate);
                 cmd.Parameters.AddWithValue("@empphoneno", phno);
-                cmd.Parameters.AddWithValue("@empno", 0);
+                cmd.Parameters.AddWithValue("@empno", empno);
                 //int result = cmd.ExecuteNonQuery();
                 //if (result != 0)
                 //{
@@ -62,12 +62,12 @@ namespace CRUDOperationMVC.Controllers
                 DataTable dt = new DataTable();
                 SqlDataAdapter sda = new SqlDataAdapter(cmd);
                 sda.Fill(dt);
-                return RedirectToAction("Create", "EmployeePortal",new {alertdata = dt.Rows[0]["Result"].ToString() });
+                return RedirectToAction("Create", "EmployeePortal", new { alertdata = dt.Rows[0]["Result"].ToString() });
             }
         }
         public ActionResult Read()
         {
-             return View();
+            return View();
         }
         public ActionResult ViewDetails()
         {
@@ -93,7 +93,7 @@ namespace CRUDOperationMVC.Controllers
                         empnoId = int.Parse(row["empno"].ToString()),
                         empusername = row["empusername"].ToString(),
                         empemail = row["empemail"].ToString(),
-                        empdob = row["empdob"].ToString(),
+                        empdob = dateformat(row["empdob"].ToString()),
                         empphono = row["empphono"].ToString(),
                     };
                     emplist.Add(emp);
@@ -101,6 +101,37 @@ namespace CRUDOperationMVC.Controllers
             }
             TempData["EmployeeList"] = emplist;
             return RedirectToAction("Create", "EmployeePortal");
+        }
+        public string dateformat(string date)
+        {
+            DateTime parsedDate;
+            string formattedDate = "";
+
+            if (DateTime.TryParse(date.ToString(), out parsedDate))
+            {
+                formattedDate = parsedDate.ToString("yyyy-MM-dd");
+                return formattedDate;
+            }
+            else
+            {
+                formattedDate = "9999-01-01";   
+                return formattedDate;
+            }
+        }
+
+        public ActionResult Delete(string empno)
+        {
+            using (SqlConnection con = new SqlConnection(connectionstring_))
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("EmployeeDelete", con);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@empno", empno);
+                DataTable dt = new DataTable();
+                SqlDataAdapter sda = new SqlDataAdapter(cmd);
+                sda.Fill(dt);
+                return RedirectToAction("Create", "EmployeePortal", new { alertdata = dt.Rows[0]["Result"].ToString() });
+            }
         }
     }
 }

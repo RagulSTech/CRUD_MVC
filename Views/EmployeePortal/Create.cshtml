@@ -2,10 +2,13 @@
     var employeeList = TempData["EmployeeList"] as List<CRUDOperationMVC.Models.employeedetails>;
     var employee = employeeList?.FirstOrDefault();
 
+    int empnoId = employee != null && !string.IsNullOrEmpty(employee.empnoId.ToString()) ? employee.empnoId : 0;
+
     string empusername = employee != null && !string.IsNullOrEmpty(employee.empusername) ? employee.empusername : "";
     string empemail = employee != null && !string.IsNullOrEmpty(employee.empemail) ? employee.empemail : "";
     string empdob = employee != null && !string.IsNullOrEmpty(employee.empdob) ? employee.empdob : "";
     string empphono = employee != null && !string.IsNullOrEmpty(employee.empphono) ? employee.empphono : "";
+    string empbutton = employee != null ? "Update Employee" : "Insert Employee";
 
 }
 <style>
@@ -45,7 +48,8 @@
             <label class="form-label">PhoneNo</label>
             <input class="form-control" type="text" name="phno" value="@empphono" />
         </div>
-        <button class="btn btn-primary" id="btnsave" type="submit" name="btnsave" style="margin-top:2%">Insert Record</button>
+        <input type="hidden" name="empno" value="@empnoId" />
+        <button class="btn btn-primary" id="btnsave" type="submit" name="btnsave" style="margin-top:2%">@empbutton</button>
     </div>
 </form>
 
@@ -61,7 +65,14 @@
                 <tr>
                     @foreach (DataColumn column in dt.Columns)
                     {
-                        <th>@column.ColumnName</th>
+                        if (@column.ColumnName == "empno")
+                        {
+                            <th style="display:none">@column.ColumnName</th>
+                        }
+                        else
+                        {
+                            <th>@column.ColumnName</th>
+                        }
                     }
                 </tr>
             </thead>
@@ -71,15 +82,22 @@
                     <tr>
                         @foreach (DataColumn column in dt.Columns)
                         {
-                            <td>
+                            <td @if (column.ColumnName == "empno") { <text>style="display:none"</text> }>
                                 @*@row[column]*@
                                 @if (@row[column].ToString() == "Edit" || @row[column].ToString() == "Delete")
                                 {
-                                    <a href="@Url.Action("Update", "EmployeePortal", new {empno = row["empno"] })">@row[column]</a>
+                                    if (@row[column].ToString() == "Edit")
+                                    {
+                                        <a href="@Url.Action("Update", "EmployeePortal", new { empno = row["empno"] })">@row[column]</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("Delete", "EmployeePortal", new { empno = row["empno"] })">@row[column]</a>
+                                    }
                                 }
                                 else
                                 {
-                                    @row[column]
+                                        @row[column] 
                                 }
                             </td>
                         }
