@@ -1,0 +1,86 @@
+﻿@Model List<CRUDOperationMVC.Models.employeedetails>
+    <style>
+        .form-label {
+            margin-top: 1%;
+        }
+    </style>
+    <h2>Employee Create</h2>
+
+    @{
+        if (ViewData["AlterMsg"] != null)
+        {
+            <div id="pclose">
+                <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+                    <p class="mb-0">@ViewData["AlterMsg"]</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+    }
+    @if (ViewData["EmployeeList"] as List<CRUDOperationMVC.Models.employeedetails> != null)
+    {
+
+    }
+
+    <form action="@Url.Action("CreateInsert","EmployeePortal")">
+        <div class="table">
+            git init
+            <div class="col">
+                <label class="form-label">Username</label>
+                <input class="form-control" type="text" name="username" id="username" />
+            </div>
+            <div class="col">
+                <label class="form-label">Email</label>
+                <input class="form-control" type="text" name="email" id="email" />
+            </div>
+            <div class="col">
+                <label class="form-label">DOB</label>
+                <input class="form-control" type="date" name="Udate" id="Udate" />
+            </div>
+            <div class="col">
+                <label class="form-label">PhoneNo</label>
+                <input class="form-control" type="text" name="phno" id="phno" />
+            </div>
+            <button class="btn btn-primary" id="btnsave" type="submit" name="btnsave" style="margin-top:2%">Insert Record</button>
+        </div>
+    </form>
+
+
+    @using System.Data;
+    @{
+        DataTable dt = ViewData["Datatablereturn"] as DataTable;
+        if (dt != null)
+        {
+            <table class="table table-striped table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        @foreach (DataColumn column in dt.Columns)
+                        {
+                            <th>@column.ColumnName</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow row in dt.Rows)
+                    {
+                        <tr>
+                            @foreach (DataColumn column in dt.Columns)
+                            {
+                                <td>
+                                    @*@row[column]*@
+                                    @if (@row[column].ToString() == "Edit" || @row[column].ToString() == "Delete")
+                                    {
+                                        <a href="@Url.Action("Update", "EmployeePortal", new {empno = row["empno"] })">@row[column]</a>
+                                    }
+                                    else
+                                    {
+                                        @row[column]
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
