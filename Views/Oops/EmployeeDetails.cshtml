@@ -1,0 +1,26 @@
+﻿@model CRUDOperationMVC.Models.EmployeePortal
+@{
+    ViewBag.Title = "EmployeeDetails";
+}
+
+<p><b>Class</b></p>
+
+<p>Employee ID : @Model.employee.emp_id <br /> Employee Name : @Model.employee.emp_name</p>
+
+<hr />
+
+<p><b>List</b></p>
+
+@foreach (var employeeL in Model.employeeL)
+{
+    <p>Employee ID : @employeeL.emp_id <br /> Employee Name : @employeeL.emp_name</p>
+}
+
+<hr />
+
+<p><b>Dictionary</b></p>
+
+@foreach (var employeeD in Model.employeeD)
+{
+    <p>Employee ID : @employeeD.Value.emp_id <br /> Employee Name : @employeeD.Value.emp_name</p>
+}

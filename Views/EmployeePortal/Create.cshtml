@@ -8,7 +8,7 @@
     string empemail = employee != null && !string.IsNullOrEmpty(employee.empemail) ? employee.empemail : "";
     string empdob = employee != null && !string.IsNullOrEmpty(employee.empdob) ? employee.empdob : "";
     string empphono = employee != null && !string.IsNullOrEmpty(employee.empphono) ? employee.empphono : "";
-    string empbutton = employee != null ? "Update Employee" : "Insert Employee";
+    string empbutton = employee != null ? "Update" : "Insert";
 
 }
 <style>
@@ -16,7 +16,96 @@
         margin-top: 1%;
     }
 </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script>
+    $(document).ready(function () {
+        $("#myInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#myTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+    $(document).ready(function () {
+        $("th").click(function () {
+            var columnIndex = $(this).index();
+            var rows = $("#myTable tr").get();
 
+            rows.sort(function (a, b) {
+                var cellA = $(a).children('td').eq(columnIndex).text();
+                var cellB = $(b).children('td').eq(columnIndex).text();
+
+                return cellA.localeCompare(cellB);
+            });
+
+            $.each(rows, function (index, row) {
+                $("#myTable").append(row);
+            });
+        });
+    });
+
+    $(document).ready(function () {
+        const pageSize = 5; // Number of records per page
+        let currentPage = 1; // Default current page
+        const totalRows = $("#myTable tr").length;
+        const totalPages = Math.ceil(totalRows / pageSize);
+
+        // Function to show only the rows for the current page
+        function paginateTable() {
+            // Hide all rows
+            $("#myTable tr").hide();
+
+            // Show only the rows for the current page
+            const startRow = (currentPage - 1) * pageSize;
+            const endRow = currentPage * pageSize;
+            $("#myTable tr").slice(startRow, endRow).show();
+
+            // Update pagination controls
+            updatePaginationControls();
+        }
+
+        // Function to update pagination controls
+        function updatePaginationControls() {
+            // Display the current page
+            $("#pageNumbers").html(`Page ${currentPage} of ${totalPages}`);
+
+            // Disable or enable Previous and Next buttons
+            if (currentPage === 1) {
+                $("#prevBtn").prop("disabled", true);
+            } else {
+                $("#prevBtn").prop("disabled", false);
+            }
+
+            if (currentPage === totalPages) {
+                $("#nextBtn").prop("disabled", true);
+            } else {
+                $("#nextBtn").prop("disabled", false);
+            }
+        }
+
+        // Handle the "Previous" button click
+        $("#prevBtn").click(function () {
+            if (currentPage > 1) {
+                currentPage--;
+                paginateTable();
+            }
+        });
+
+        // Handle the "Next" button click
+        $("#nextBtn").click(function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                paginateTable();
+            }
+        });
+
+        // Initial pagination setup
+        paginateTable();
+    });
+
+
+</script>
 @{
     if (ViewData["AlterMsg"] != null)
     {
@@ -52,13 +141,17 @@
     </div>
 </form>
 
-
+<input id="myInput" type="text" placeholder="Search.." style="margin-bottom:2%;float:right;">
 
 @using System.Data;
 @{
     DataTable dt = ViewData["Datatablereturn"] as DataTable;
     if (dt != null)
     {
+        int totalRecords = dt?.Rows.Count ?? 0;     
+        int pageSize = 10;  
+        int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);    
+        int currentPage = 1;    
         <table class="table table-striped table-bordered table-hover">
             <thead class="table-dark">
                 <tr>
@@ -66,23 +159,26 @@
                     {
                         if (@column.ColumnName == "empno")
                         {
-                            <th style="display:none">@column.ColumnName</th>
+                            <th style="display:none; cursor:pointer;">@column.ColumnName</th>
                         }
                         else
                         {
-                            <th>@column.ColumnName</th>
+                            <th style="cursor: pointer;">
+                                @column.ColumnName
+                                <i class="fas fa-sort-down" style="float: right;"></i>
+                            </th>
                         }
                     }
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="myTable">
                 @foreach (DataRow row in dt.Rows)
                 {
                     <tr>
                         @foreach (DataColumn column in dt.Columns)
                         {
-                            <td @if (column.ColumnName == "empno") { <text>style="display:none"</text> }>
-                                @*@row[column]*@
+                            <td @if (column.ColumnName == "empno") { <text> style="display:none" </text> }>
+                                @*@row[column] *@
                                 @if (@row[column].ToString() == "Edit" || @row[column].ToString() == "Delete")
                                 {
                                     if (@row[column].ToString() == "Edit")
@@ -96,13 +192,59 @@
                                 }
                                 else
                                 {
-                                        @row[column] 
+                                    @row[column]
                                 }
                             </td>
                         }
                     </tr>
                 }
+                @if (dt.Rows.Count == 0)
+                {
+                    <tr><td colspan="@dt.Columns.Count">No Records Founds.</td></tr>
+                }
             </tbody>
         </table>
+
+        <div id="paginationControls" class="pagination">
+            <button class="page-btn" id="prevBtn">Previous</button>
+            <button class="page-btn" id="nextBtn">Next</button>
+
+            <span id="pageNumbers" style="float:right;"></span>
+        </div>
     }
 }
+<style>
+    .pagination {
+        display: flex;
+        justify-content: flex-start; /* Align the buttons to the left */
+        align-items: center;
+        width: 100%;
+    }
+
+    .page-btn {
+        margin: 0 5px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+
+        .page-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+    /* This will align the page numbers to the right */
+    #pageNumbers {
+        margin-left: auto;
+        font-size: 14px;
+        padding-right: 20px;
+    }
+
+</style>

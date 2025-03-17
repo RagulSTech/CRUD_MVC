@@ -77,3 +77,7 @@ C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\obj\Debug\CRUDOper
 C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\obj\Debug\CRUDOper.016237F3.Up2Date
 C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\obj\Debug\CRUDOperationMVC.dll
 C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\obj\Debug\CRUDOperationMVC.pdb
+C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\bin\EntityFramework.dll
+C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\bin\EntityFramework.SqlServer.dll
+C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\bin\EntityFramework.xml
+C:\Users\80128\source\repos\CRUDOperationMVC\CRUDOperationMVC\bin\EntityFramework.SqlServer.xml
